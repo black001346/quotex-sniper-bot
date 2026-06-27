@@ -1,14 +1,23 @@
 import streamlit as st
 import yfinance as yf
+import pandas as pd
 
+st.set_page_config(page_title="Sniper Engine", layout="centered")
 st.title("🎯 Sniper Trading Engine")
-st.write("Engine Online!")
 
 # Currency pair select karne ka option
 pair = st.selectbox("Select Currency Pair", ["EURUSD=X", "GBPUSD=X", "BTC-USD"])
 
-# Data fetch karne ka button
 if st.button("Get Live Price"):
-    data = yf.Ticker(pair)
-    price = data.history(period="1d")['Close'].iloc[-1]
-    st.write(f"Current Price of {pair}: {price:.5f}")
+    try:
+        # Market data fetch karna
+        ticker = yf.Ticker(pair)
+        data = ticker.history(period="1d")
+        
+        if not data.empty:
+            price = data['Close'].iloc[-1]
+            st.success(f"✅ Current Price of {pair}: {price:.5f}")
+        else:
+            st.error("❌ Data fetch nahi ho saka, market closed ho sakti hai.")
+    except Exception as e:
+        st.error(f"Error: {e}")
